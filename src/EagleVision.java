@@ -33,7 +33,7 @@ public class EagleVision {
     //calculations
     private double center_x = 0;
     private double azimuth = 3322; //initialize to something unreasonable
-    private double imageCenter = 416 / 2.0 - 0.5;
+    private double imageCenter = (416 / 2.0) - 0.5;
     private double focalLength = (0.5 * 416 / Math.tan(74/2));
     private double contour_number = 0;
 
@@ -48,8 +48,8 @@ public class EagleVision {
         // Step HSV_Threshold0:
         Mat hsvThresholdInput = source0;
         double[] hsvThresholdHue = {46, 103};
-        double[] hsvThresholdSaturation = {254.0, 255.0};
-        double[] hsvThresholdValue = {151, 255.0};
+        double[] hsvThresholdSaturation = {120, 255.0};
+        double[] hsvThresholdValue = {80, 255.0};
         hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
         // Step Find_Contours0:
@@ -59,11 +59,11 @@ public class EagleVision {
 
         // Step Filter_Contours0:
         ArrayList<MatOfPoint> filterContoursContours = findContoursOutput;
-        double filterContoursMinArea = 75.0;
-        double filterContoursMinPerimeter = 0;
-        double filterContoursMinWidth = 0;
+        double filterContoursMinArea = 50;
+        double filterContoursMinPerimeter = 100;
+        double filterContoursMinWidth = 8;
         double filterContoursMaxWidth = 1000;
-        double filterContoursMinHeight = 0;
+        double filterContoursMinHeight = 10;
         double filterContoursMaxHeight = 1000;
         double[] filterContoursSolidity = {0, 100};
         double filterContoursMaxVertices = 1000000;
@@ -71,7 +71,6 @@ public class EagleVision {
         double filterContoursMinRatio = 0;
         double filterContoursMaxRatio = 1000;
         filterContours(filterContoursContours, filterContoursMinArea, filterContoursMinPerimeter, filterContoursMinWidth, filterContoursMaxWidth, filterContoursMinHeight, filterContoursMaxHeight, filterContoursSolidity, filterContoursMaxVertices, filterContoursMinVertices, filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
-        calculateAzimuth();
     }
 
     /**
@@ -110,7 +109,7 @@ public class EagleVision {
      */
     private void hsvThreshold(Mat input, double[] hue, double[] sat, double[] val,
                               Mat out) {
-        Imgproc.cvtColor(input, out, Imgproc.COLOR_RGB2BGR);
+        Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2HSV);
         Core.inRange(out, new Scalar(hue[0], sat[0], val[0]),
                 new Scalar(hue[1], sat[1], val[1]), out);
     }
@@ -158,6 +157,7 @@ public class EagleVision {
         output.clear();
         //operation
         for (int i = 0; i < inputContours.size(); i++) {
+            System.out.println("Processing...");
             final MatOfPoint contour = inputContours.get(i);
             final Rect bb = Imgproc.boundingRect(contour);
             if (bb.width < minWidth || bb.width > maxWidth) continue;
@@ -179,12 +179,18 @@ public class EagleVision {
             final double ratio = bb.width / (double)bb.height;
             if (ratio < minRatio || ratio > maxRatio) continue;
             output.add(contour);
+            contour_number++;
             center_x = center_x + bb.x;
         }
+        System.out.println("Center: "+center_x / contour_number);
+        System.out.println("Contours: "+ contour_number);
+        calculateAzimuth();
+
     }
     private void calculateAzimuth(){
-        azimuth = ( ( Math.atan((center_x / filterContoursOutput.size())- imageCenter) / focalLength) * 180 / Math.PI);
-        System.out.println(azimuth);
+        azimuth = ((center_x / contour_number) - 416/2) * 74/416;//( ( Math.atan((center_x / contour_number)- imageCenter) / focalLength) * 180 / Math.PI);
+        System.out.println("Azimuth "+azimuth);
+        center_x = 0;
+        contour_number = 0;
     }
 }
-

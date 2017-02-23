@@ -1,20 +1,10 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.HashMap;
 import java.lang.Math;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import org.opencv.core.*;
-import org.opencv.core.Core.*;
-import org.opencv.features2d.FeatureDetector;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.*;
-import org.opencv.objdetect.*;
-import org.opencv.videoio.VideoCapture;
 
 /**
  * GRIP class.
@@ -24,7 +14,10 @@ import org.opencv.videoio.VideoCapture;
  * @author GRIP
  */
 public class EagleVision {
-
+    NetworkTable sd;
+    EagleVision(NetworkTable sd){
+        this.sd = sd;
+    }
     //Outputs
     private Mat hsvThresholdOutput = new Mat();
     private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>();
@@ -188,8 +181,15 @@ public class EagleVision {
 
     }
     private void calculateAzimuth(){
-        azimuth = ((center_x / contour_number) - 416/2) * 74/416;//( ( Math.atan((center_x / contour_number)- imageCenter) / focalLength) * 180 / Math.PI);
+        azimuth = ((center_x / contour_number) - imageCenter) * 74/416;//( ( Math.atan((center_x / contour_number)- imageCenter) / focalLength) * 180 / Math.PI);
         System.out.println("Azimuth "+azimuth);
+        if(contour_number == 2) {
+            sd.putBoolean("detected_target",true);
+            sd.putNumber("angle_to_target", azimuth);
+        }
+        else{
+            sd.putBoolean("detected_target",false);
+        }
         center_x = 0;
         contour_number = 0;
     }

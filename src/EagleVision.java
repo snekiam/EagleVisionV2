@@ -52,8 +52,8 @@ public class EagleVision {
 
         // Step Filter_Contours0:
         ArrayList<MatOfPoint> filterContoursContours = findContoursOutput;
-        double filterContoursMinArea = 50;
-        double filterContoursMinPerimeter = 100;
+        double filterContoursMinArea = 5;
+        double filterContoursMinPerimeter = 10;
         double filterContoursMinWidth = 8;
         double filterContoursMaxWidth = 1000;
         double filterContoursMinHeight = 10;

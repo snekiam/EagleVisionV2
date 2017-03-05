@@ -13,7 +13,7 @@ public class Process {
             System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 //				opens up the camera stream and tries to load it
             videoCapture = new VideoCapture();
-            videoCapture.open("http://10.33.22.32:8080/?action=stream");
+            videoCapture.open("http://10.33.22.7:5810/?action=stream");
             while(!videoCapture.isOpened()){
                 System.out.println("Didn't open Camera, restart jar");
             }

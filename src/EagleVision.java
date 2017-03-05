@@ -40,7 +40,7 @@ public class EagleVision {
     public void process(Mat source0) {
         // Step HSV_Threshold0:
         Mat hsvThresholdInput = source0;
-        double[] hsvThresholdHue = {46, 103};
+        double[] hsvThresholdHue = {46, 160};
         double[] hsvThresholdSaturation = {120, 255.0};
         double[] hsvThresholdValue = {80, 255.0};
         hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
